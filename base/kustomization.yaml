@@ -4,6 +4,7 @@ resources:
   - deploy-frontend.yaml
   - deploy-oauth2-proxy.yaml
   - middleware.yaml
+  - maintenance
 
 labels:
   - includeSelectors: true
