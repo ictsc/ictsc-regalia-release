@@ -1,0 +1,44 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: scoreserver-contestant-web
+spec:
+  entryPoints: [websecure]
+  routes:
+    - kind: Rule
+      match: Host(`contest-dev.ictsc.net`)
+      middlewares:
+        - name: compress
+          namespace: traefik
+        - name: forward-auth
+          namespace: forward-auth
+      services:
+        - name: scoreserver-frontend
+          port: contestant
+          scheme: http
+    - kind: Rule
+      match: Host(`contest-dev.ictsc.net`) && PathPrefix(`/api`)
+      middlewares:
+        - name: compress
+          namespace: traefik
+        - name: scoreserver-strip-api-prefix
+        - name: forward-auth
+          namespace: forward-auth
+      services:
+        - name: scoreserver-backend
+          port: contestant
+          scheme: http
+  tls:
+    secretName: scoreserver-contestant-web-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: scoreserver-contestant-web
+spec:
+  dnsNames:
+    - contest-dev.ictsc.net
+  issuerRef:
+    kind: ClusterIssuer
+    name: common-issuer
+  secretName: scoreserver-contestant-web-cert

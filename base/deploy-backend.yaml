@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scoreserver-backend
+  labels:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: scoreserver-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scoreserver-backend
+    spec:
+      containers:
+        - name: scoreserver
+          image: backend
+          args:
+            - --contestant.http-addr=0.0.0.0:8080
+            - --admin.http-addr=0.0.0.0:8081
+            - --admin.auth-config-file=/etc/scoreserver/admin-auth-config.yaml
+            - --admin.auth-policy-file=/etc/scoreserver/admin-auth-policy.csv
+          env:
+            - name: CONTESTANT_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-env
+                  key: contestant-base-url
+            - name: PGHOST
+              value: ictsc-cluster
+            - name: PGDATABASE
+              value: ictscore
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: ictsc.ictsc-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ictsc.ictsc-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: REDIS_URL
+              value: redis://redis-haproxy.scoreserver.svc.cluster.local:6379/0
+            - name: GROWI_BASE_URL
+              value: https://wiki.ictsc.net
+            - name: GROWI_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-secrets
+                  key: growi-api-token
+            - name: DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-secrets
+                  key: discord-client-id
+            - name: DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-secrets
+                  key: discord-client-secret
+            - name: OTEL_TRACES_EXPORTER
+              value: none
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+          ports:
+            - containerPort: 8080
+              name: contestant
+            - containerPort: 8081
+              name: admin
+          volumeMounts:
+            - name: config
+              mountPath: /etc/scoreserver
+              readOnly: true
+          livenessProbe:
+            initialDelaySeconds: 10
+            grpc:
+              port: 8081
+          resources:
+            requests:
+              memory: 16Mi
+              cpu: 10m
+            limits:
+              memory: 128Mi
+              cpu: "1"
+      volumes:
+        - name: config
+          configMap:
+            name: backend-config

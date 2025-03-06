@@ -1,0 +1,10 @@
+issuers:
+  - issuer: https://dex.drove-dev.ictsc.net
+    client_id: dex-scoreserver-client
+    username_key: name
+    group_keys: [groups]
+  - issuer: https://kubernetes.default.svc.cluster.local
+    client_id: contest.ictsc.net
+    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    username_key: sub
+    group_keys: [sub]

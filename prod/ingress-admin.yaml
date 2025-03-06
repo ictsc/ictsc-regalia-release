@@ -1,0 +1,50 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: scoreserver-admin-web
+spec:
+  entryPoints: [websecure]
+  routes:
+    - kind: Rule
+      match: Host(`contest-admin.ictsc.net`)
+      middlewares:
+        - name: compress
+          namespace: traefik
+        - name: scoreserver-admin-auth-error
+        - name: scoreserver-admin-forward-auth
+      services:
+        - name: scoreserver-frontend
+          port: admin
+          scheme: http
+    - kind: Rule
+      match: Host(`contest-admin.ictsc.net`) && PathPrefix(`/api`)
+      middlewares:
+        - name: compress
+          namespace: traefik
+        - name: scoreserver-admin-forward-auth
+        - name: scoreserver-strip-api-prefix
+      services:
+        - name: scoreserver-backend
+          port: admin
+          scheme: http
+    - kind: Rule
+      match: Host(`contest-admin.ictsc.net`) && PathPrefix(`/oauth2/`)
+      services:
+        - name: scoreserver-admin-auth-proxy
+          port: http
+          scheme: http
+  tls:
+    secretName: scoreserver-admin-web-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: scoreserver-admin-web
+spec:
+  dnsNames:
+    - contest-admin.ictsc.net
+  issuerRef:
+    kind: ClusterIssuer
+    name: common-issuer
+  secretName: scoreserver-admin-web-cert
+

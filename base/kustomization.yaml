@@ -1,0 +1,11 @@
+resources:
+  - service.yaml
+  - deploy-backend.yaml
+  - deploy-frontend.yaml
+  - deploy-oauth2-proxy.yaml
+  - middleware.yaml
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/part-of: scoreserver

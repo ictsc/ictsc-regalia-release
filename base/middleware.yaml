@@ -1,0 +1,33 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: scoreserver-strip-api-prefix
+spec:
+  stripPrefix:
+    prefixes: ["/api"]
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: scoreserver-admin-forward-auth
+spec:
+  forwardAuth:
+    address: http://scoreserver-admin-auth-proxy.scoreserver.svc.cluster.local/oauth2/auth
+    authResponseHeaders:
+      - Authorization
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: scoreserver-admin-auth-error
+spec:
+  errors:
+    status:
+      - "401-403"
+    query: /oauth2/sign_in
+    service:
+      kind: Service
+      name: scoreserver-admin-auth-proxy
+      port: http
+      
+

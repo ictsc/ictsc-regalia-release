@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scoreserver-frontend
+  labels:
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/name: scoreserver-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scoreserver-frontend
+    spec:
+      containers:
+        - name: scoreserver
+          image: frontend
+          ports:
+            - containerPort: 8080
+              name: contestant
+            - containerPort: 8081
+              name: admin
+          livenessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: /healthz
+              port: contestant
+          resources:
+            requests:
+              memory: 16Mi
+              cpu: 10m
+            limits:
+              memory: 64Mi
+              cpu: "1"
