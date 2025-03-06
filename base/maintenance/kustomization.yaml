@@ -1,0 +1,11 @@
+resources:
+  - deployment.yaml
+  - service.yaml
+
+configMapGenerator:
+  - name: scoreserver-maintenance-html
+    files:
+      - index.html
+  - name: scoreserver-maintenance-nginx-conf
+    files:
+      - nginx.conf

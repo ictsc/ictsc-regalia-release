@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: scoreserver-contestant-maintenance
+spec:
+  entryPoints: [websecure]
+  routes:
+    - kind: Rule
+      match: Host(`contest-dev.ictsc.net`)
+      priority: 1000
+      middlewares:
+        - name: compress
+          namespace: traefik
+      services:
+        - name: scoreserver-maintenance
+          port: http
+          scheme: http
+  tls:
+    secretName: scoreserver-contestant-web-cert
