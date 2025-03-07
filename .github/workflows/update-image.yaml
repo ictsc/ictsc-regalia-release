@@ -41,7 +41,11 @@ jobs:
         with:
           script: |
             const inputs = JSON.parse(process.env.inputs);
-            const { owner, repo, runId, serverUrl } = context;
+            const {
+              repo: {owner, repo},
+              runId,
+              serverUrl
+            } = context;
 
             const head = `update-image-${ inputs.environment }`;
             const base = context.ref.split('/').pop();
