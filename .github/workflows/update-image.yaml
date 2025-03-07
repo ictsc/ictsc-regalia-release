@@ -1,6 +1,6 @@
 name: Update Image
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       newTag:
         description: 'New image tag'
