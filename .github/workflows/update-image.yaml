@@ -7,14 +7,6 @@ on:
         required: true
         default: 'dev'
         type: string
-      image:
-        description: 'Image name to update'
-        required: true
-        type: string
-      newName:
-        description: 'New image name'
-        required: true
-        type: string
       newTag:
         description: 'New image tag'
         required: true
@@ -22,7 +14,7 @@ on:
 
 jobs:
   update-image:
-    name: Update image ${{ inputs.image }} to ${{ inputs.newName }}:${{ inputs.newTag }}
+    name: "[${{ inputs.environment }}] Update images to :${{ inputs.newTag }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +28,11 @@ jobs:
           git config --global user.name "github-actions[bot]"
 
           cd ${{ inputs.environment }}
-          kustomize edit set image ${{ inputs.image }}=${{ inputs.newName }}:${{ inputs.newTag }}
-          git commit -am "Update image ${{ inputs.image }} to ${{ inputs.newName }}:${{ inputs.newTag }}"
+          kustomize edit set image \
+            backend=ghcr.io/ictsc/ictsc-regalia/scoreserver:${{ inputs.newTag }} \
+            frontend=ghcr.io/ictsc/ictsc-regalia/frontend:${{ inputs.newTag }}
+
+          git commit -am "[${{ inputs.environment }}] Update images to :${{ inputs.newTag }}"
           git push --force origin $(git branch --show-current):update-image-${{ inputs.environment }}
 
       - uses: actions/github-script@v7
@@ -50,8 +45,8 @@ jobs:
 
             const head = `update-image-${ inputs.environment }`;
             const base = context.ref.split('/').pop();
-            const title = `[${ inputs.environment }] Update image ${ inputs.image } to ${ inputs.newName }:${ inputs.newTag }`;
-            const body = `Update image ${ inputs.image } to ${ inputs.newName }:${ inputs.newTag } in ${ inputs.environment } environment
+            const title = `[${ inputs.environment }] Update images :${ inputs.newTag }`;
+            const body = `Update images to :${ inputs.newTag } in ${ inputs.environment } environment
 
             GitHub Actions Job: ${ serverUrl }/${ owner }/${ repo }/actions/runs/${ runId }`
 
