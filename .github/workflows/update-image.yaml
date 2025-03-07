@@ -2,14 +2,6 @@ name: Update Image
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment to update images in'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-          - dev
-          - prod
       newTag:
         description: 'New image tag'
         required: true
@@ -17,7 +9,10 @@ on:
 
 jobs:
   update-image:
-    name: "[${{ inputs.environment }}] Update images to :${{ inputs.newTag }}"
+    name: "[${{ matrix.environment }}] Update images to :${{ inputs.newTag }}"
+    strategy:
+      matrix:
+        environment: ['dev', 'prod']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,31 +25,33 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
-          cd ${{ inputs.environment }}
+          cd ${{ matrix.environment }}
           kustomize edit set image \
             backend=ghcr.io/ictsc/ictsc-regalia/scoreserver:${{ inputs.newTag }} \
             frontend=ghcr.io/ictsc/ictsc-regalia/frontend:${{ inputs.newTag }}
 
-          git commit -am "[${{ inputs.environment }}] Update images to :${{ inputs.newTag }}"
-          git push --force origin $(git branch --show-current):update-image-${{ inputs.environment }}
+          git commit -am "[${{ matrix.environment }}] Update images to :${{ inputs.newTag }}"
+          git push --force origin $(git branch --show-current):update-image-${{ matrix.environment }}
 
       - name: Create or update pull request
         uses: actions/github-script@v7
         env:
           inputs: ${{ toJSON(inputs) }}
+          matrix: ${{ toJSON(matrix) }}
         with:
           script: |
             const inputs = JSON.parse(process.env.inputs);
+            const matrix = JSON.parse(process.env.matrix);
             const {
               repo: {owner, repo},
               runId,
               serverUrl
             } = context;
 
-            const head = `update-image-${ inputs.environment }`;
+            const head = `update-image-${ matrix.environment }`;
             const base = context.ref.split('/').pop();
-            const title = `[${ inputs.environment }] Update images to :${ inputs.newTag }`;
-            const body = `Update images to :${ inputs.newTag } in ${ inputs.environment } environment
+            const title = `[${ matrix.environment }] Update images to :${ inputs.newTag }`;
+            const body = `Update images to :${ inputs.newTag } in ${ matrix.environment } environment
 
             GitHub Actions Job: ${ serverUrl }/${ owner }/${ repo }/actions/runs/${ runId }`
 
