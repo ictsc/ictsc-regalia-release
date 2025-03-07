@@ -1,0 +1,12 @@
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  call-update-image:
+    uses: ./.github/workflows/update-image.yaml
+    with:
+      image: 'backend-env'
+      environment: 'dev'
+      newName: 'ghcr.io/ictsc/ictsc-regalia/scoreserver'
+      newTag: 'latest'

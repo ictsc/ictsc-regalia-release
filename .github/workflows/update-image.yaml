@@ -1,15 +1,12 @@
 name: Update Image
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
         description: 'Environment to apply secrets'
         required: true
         default: 'dev'
-        type: choice
-        options:
-          - dev
-          - prod
+        type: string
       image:
         description: 'Image name to update'
         required: true
