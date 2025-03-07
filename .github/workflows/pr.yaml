@@ -1,9 +1,0 @@
-on:
-  push:
-
-jobs:
-  call-update-image:
-    uses: ./.github/workflows/update-image.yaml
-    with:
-      environment: 'dev'
-      newTag: 'latest'
