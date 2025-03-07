@@ -3,7 +3,7 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: 'Environment to apply secrets'
+        description: 'Environment to update images in'
         required: true
         default: 'dev'
         type: string
