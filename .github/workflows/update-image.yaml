@@ -38,7 +38,7 @@ jobs:
           cd ${{ inputs.environment }}
           kustomize edit set image ${{ inputs.image }}=${{ inputs.newName }}:${{ inputs.newTag }}
           git commit -am "Update image ${{ inputs.image }} to ${{ inputs.newName }}:${{ inputs.newTag }}"
-          git push --force origin HEAD:update-image-${{ inputs.environment }}
+          git push --force origin $(git branch --show-current):update-image-${{ inputs.environment }}
 
       - uses: actions/github-script@v7
         with:
