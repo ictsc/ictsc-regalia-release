@@ -27,6 +27,7 @@ spec:
             - --redis-connection-url=redis://redis-haproxy.scoreserver.svc.cluster.local:6379/1
             # Header
             - --set-authorization-header=true
+            - --skip-jwt-bearer-tokens=true
             # Provider
             - --provider=oidc
             - --provider-display-name=OIDC
