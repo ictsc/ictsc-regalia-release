@@ -5,6 +5,7 @@ resources:
   - deploy-oauth2-proxy.yaml
   - middleware.yaml
   - maintenance
+  - secret-manager-role.yaml
 
 labels:
   - includeSelectors: true
