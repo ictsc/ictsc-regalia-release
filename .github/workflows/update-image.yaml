@@ -53,7 +53,7 @@ jobs:
             const title = `[${ inputs.environment }] Update image ${ inputs.image } to ${ inputs.newName }:${ inputs.newTag }`;
             const body = `Update image ${ inputs.image } to ${ inputs.newName }:${ inputs.newTag } in ${ inputs.environment } environment
 
-            GitHub Actions Job: ${ serverUrl }}/${ owner }/${ repo }/actions/runs/${ runId }`
+            GitHub Actions Job: ${ serverUrl }/${ owner }/${ repo }/actions/runs/${ runId }`
 
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
