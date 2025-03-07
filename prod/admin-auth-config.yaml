@@ -1,5 +1,5 @@
 issuers:
-  - issuer: https://dex.drove-dev.ictsc.net
+  - issuer: https://dex.drove.ictsc.net
     client_id: dex-scoreserver-client
     username_key: name
     group_keys: [groups]
