@@ -1,12 +1,15 @@
 name: Update Image
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       environment:
         description: 'Environment to update images in'
         required: true
         default: 'dev'
-        type: string
+        type: choice
+        options:
+          - dev
+          - prod
       newTag:
         description: 'New image tag'
         required: true
