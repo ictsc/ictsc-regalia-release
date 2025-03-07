@@ -41,14 +41,19 @@ jobs:
           git push --force origin $(git branch --show-current):update-image-${{ inputs.environment }}
 
       - uses: actions/github-script@v7
+        env:
+          inputs: ${{ toJSON(inputs) }}
         with:
           script: |
-            const head = `update-image-${{ inputs.environment }}`;
-            const base = context.ref.split('/').pop();
-            const title = `[${{ inputs.environment }}] Update image ${{ inputs.image }} to ${{ inputs.newName }}:${{ inputs.newTag }}`;
-            const body = `Update image ${{ inputs.image }} to ${{ inputs.newName }}:${{ inputs.newTag }} in ${{ inputs.environment }} environment
+            const inputs = JSON.parse(process.env.inputs);
+            const { owner, repo, runId, serverUrl } = context;
 
-            GitHub Actions Job: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+            const head = `update-image-${ inputs.environment }`;
+            const base = context.ref.split('/').pop();
+            const title = `[${ inputs.environment }] Update image ${ inputs.image } to ${ inputs.newName }:${ inputs.newTag }`;
+            const body = `Update image ${ inputs.image } to ${ inputs.newName }:${ inputs.newTag } in ${ inputs.environment } environment
+
+            GitHub Actions Job: ${ serverUrl }}/${ owner }/${ repo }/actions/runs/${ runId }`
 
             const { data: pullRequests } = await github.pulls.list({
               owner: context.repo.owner,
