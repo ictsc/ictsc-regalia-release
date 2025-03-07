@@ -31,6 +31,10 @@ jobs:
           aqua_version: v2.39.1
       - name: Update image
         run: |
+          # https://github.com/orgs/community/discussions/26560
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
           cd ${{ inputs.environment }}
           kustomize edit set image ${{ inputs.image }}=${{ inputs.newName }}:${{ inputs.newTag }}
           git commit -am "Update image ${{ inputs.image }} to ${{ inputs.newName }}:${{ inputs.newTag }}"
