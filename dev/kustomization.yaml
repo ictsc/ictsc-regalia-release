@@ -1,32 +1,33 @@
 resources:
-  - ../base
-  - ingress-contestant.yaml
-  - ingress-admin.yaml
+- ../base
+- ingress-contestant.yaml
+- ingress-admin.yaml
   # - ./maintenance
 
 namespace: scoreserver
 
 images:
-  - name: backend
-    newName: ghcr.io/ictsc/ictsc-regalia/scoreserver
-    newTag: sha-fd0b5c9
-  - name: frontend
-    newName: ghcr.io/ictsc/ictsc-regalia/frontend
-    newTag: sha-fd0b5c9
-  - name: frontend
-  - name: quay.io/oauth2-proxy/oauth2-proxy
-    newTag: v7.8.1
+- name: backend
+  newName: ghcr.io/ictsc/ictsc-regalia/scoreserver
+  newTag: ghcr.io/ictsc/ictsc-regalia:sha-3ba8afe
+- name: frontend
+  newName: ghcr.io/ictsc/ictsc-regalia/frontend
+  newTag: ghcr.io/ictsc/ictsc-regalia:sha-3ba8afe
+- name: quay.io/oauth2-proxy/oauth2-proxy
+  newTag: v7.8.1
 
 configMapGenerator:
-  - name: backend-env
-    literals:
-      - contestant-base-url=https://contest-dev.ictsc.net/api
-  - name: backend-config
-    files:
-      - admin-auth-policy.csv
-      - admin-auth-config.yaml
-  - name: oauth2-proxy-env
-    literals:
-      - client-id=dex-scoreserver-client
-      - oidc-issuer-url=https://dex.drove-dev.ictsc.net
-      - redirect-url=https://contest-admin-dev.ictsc.net/oauth2/callback
+- literals:
+  - contestant-base-url=https://contest-dev.ictsc.net/api
+  name: backend-env
+- files:
+  - admin-auth-policy.csv
+  - admin-auth-config.yaml
+  name: backend-config
+- literals:
+  - client-id=dex-scoreserver-client
+  - oidc-issuer-url=https://dex.drove-dev.ictsc.net
+  - redirect-url=https://contest-admin-dev.ictsc.net/oauth2/callback
+  name: oauth2-proxy-env
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
