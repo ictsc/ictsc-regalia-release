@@ -16,7 +16,7 @@ images:
     newTag: sha-e4cbff5
   - name: discord-admin-bot
     newName: ghcr.io/ictsc/ictsc-discord-bot
-    newTag: sha-c5003f7
+    newTag: sha-d9e14d2
   - name: quay.io/oauth2-proxy/oauth2-proxy
     newTag: v7.8.1
 
