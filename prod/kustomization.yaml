@@ -2,7 +2,7 @@ resources:
   - ../base
   - ingress-contestant.yaml
   - ingress-admin.yaml
-  - ./maintenance
+  # - ./maintenance
 
 namespace: scoreserver
 
