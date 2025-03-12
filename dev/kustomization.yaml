@@ -9,10 +9,10 @@ namespace: scoreserver
 images:
   - name: backend
     newName: ghcr.io/ictsc/ictsc-regalia/backend
-    newTag: sha-6955a21
+    newTag: sha-3947c39
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
-    newTag: sha-6955a21
+    newTag: sha-3947c39
   - name: quay.io/oauth2-proxy/oauth2-proxy
     newTag: v7.8.1
 
