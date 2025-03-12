@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: discord-admin-bot
+  labels:
+    app.kubernetes.io/name: discord-admin-bot
+    app.kubernetes.io/component: discord-admin-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: discord-admin-bot
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: discord-admin-bot
+    spec:
+      serviceAccountName: discord-admin-bot
+      volumes:
+        - name: admin-api-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: contest.ictsc.net
+                  expirationSeconds: 604800
+                  path: token
+      containers:
+        - name: bot
+          image: discord-admin-bot
+          env:
+            - name: STAFF_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: discord-admin-bot-secrets
+                  key: admin-password
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: discord-admin-bot-secrets
+                  key: discord-token
+            - name: DISCORD_APPLICATION_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: discord-admin-bot-env
+                  key: discord-application-id
+            - name: DISCORD_GUILD_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: discord-admin-bot-env
+                  key: discord-guild-id
+            - name: ADMIN_APIBASE
+              value: http://scoreserver-backend:8081/
+            - name: ADMIN_TOKEN_FILE
+              value: /var/run/secrets/bot/token
+          volumeMounts:
+            - name: admin-api-token
+              mountPath: /var/run/secrets/bot
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 500m
+            requests:
+              memory: 16Mi
+              cpu: 10m
