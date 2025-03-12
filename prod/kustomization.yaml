@@ -1,5 +1,6 @@
 resources:
   - ../base
+  - ../base/discord-admin-bot
   - ingress-contestant.yaml
   - ingress-admin.yaml
   # - ./maintenance
@@ -13,6 +14,9 @@ images:
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
     newTag: sha-e4cbff5
+  - name: discord-admin-bot
+    newName: ghcr.io/ictsc/ictsc-discord-bot
+    newTag: sha-c5003f7
   - name: quay.io/oauth2-proxy/oauth2-proxy
     newTag: v7.8.1
 
@@ -29,3 +33,7 @@ configMapGenerator:
       - client-id=dex-scoreserver-client
       - oidc-issuer-url=https://dex.drove.ictsc.net
       - redirect-url=https://contest-admin.ictsc.net/oauth2/callback
+  - name: discord-admin-bot-env
+    literals:
+      - discord-application-id=1346701532137001000
+      - discord-guild-id=1346673518481244201
