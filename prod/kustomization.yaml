@@ -1,6 +1,7 @@
 resources:
   - ../base
   - ../base/discord-admin-bot
+  - ../base/batch
   - ingress-contestant.yaml
   - ingress-admin.yaml
   # - ./maintenance
@@ -13,6 +14,9 @@ images:
     newTag: sha-30bd548
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
+    newTag: sha-30bd548
+  - name: batch
+    newName: ghcr.io/ictsc/ictsc-regalia/batch
     newTag: sha-30bd548
   - name: discord-admin-bot
     newName: ghcr.io/ictsc/ictsc-discord-bot
