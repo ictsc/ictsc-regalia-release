@@ -36,6 +36,22 @@ spec:
   tls:
     secretName: scoreserver-admin-web-cert
 ---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: scoreserver-admin-api
+spec:
+  entryPoints: [websecure]
+  routes:
+    - kind: Rule
+      match: Host(`contest-admin-api.drove.ictsc.net`)
+      services:
+        - name: scoreserver-backend
+          port: admin
+          scheme: http
+  tls:
+    secretName: scoreserver-admin-api-cert
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -47,4 +63,15 @@ spec:
     kind: ClusterIssuer
     name: common-issuer
   secretName: scoreserver-admin-web-cert
-
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: scoreserver-admin-api
+spec:
+  dnsNames:
+    - contest-admin-api.drove.ictsc.net
+  issuerRef:
+    kind: ClusterIssuer
+    name: common-issuer
+  secretName: scoreserver-admin-api-cert
