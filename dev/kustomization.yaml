@@ -1,6 +1,7 @@
 resources:
   - ../base
   # - ../base/discord-admin-bot
+  - ../base/batch
   - ingress-contestant.yaml
   - ingress-admin.yaml
   # - ./maintenance
@@ -10,10 +11,13 @@ namespace: scoreserver
 images:
   - name: backend
     newName: ghcr.io/ictsc/ictsc-regalia/backend
-    newTag: sha-e665d18
+    newTag: sha-db58a52
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
-    newTag: sha-e665d18
+    newTag: sha-db58a52
+  - name: batch
+    newName: ghcr.io/ictsc/ictsc-regalia/batch
+    newTag: sha-db58a52
   - name: discord-admin-bot
     newName: ghcr.io/ictsc/ictsc-discord-bot
     newTag: sha-d9e14d2

@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: scoreserver-batch
+  labels:
+    app.kubernetes.io/name: scoreserver-batch
+    app.kubernetes.io/component: batch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-batch
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scoreserver-batch
+    spec:
+      serviceAccountName: scoreserver-batch
+      volumes:
+        - name: admin-api-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: contest.ictsc.net
+                  path: token
+              - secret:
+                  name: sstate-secrets
+                  items:
+                    - key: sstate-ca.crt
+                      path: sstate-ca.crt
+      containers:
+        - name: batch
+          image: batch
+          args:
+            - --api-url=http://scoreserver-backend:8081
+            - --api-token-file=/var/run/secrets/batch/token 
+            - --sstate-tls-skip-verify
+            - --sstate-ca-file=/var/run/secrets/batch/sstate-ca.crt
+          env:
+            - name: SSTATE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sstate-secrets
+                  key: url 
+            - name: SSTATE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: sstate-secrets
+                  key: user
+            - name: SSTATE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sstate-secrets
+                  key: password
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: "5000"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-col-opentelemetry-collector.otel-col.svc.cluster.local:4317
+          volumeMounts:
+            - name: admin-api-token
+              mountPath: /var/run/secrets/batch
+              readOnly: true
+          resources:
+            limits:
+              memory: 128Mi

@@ -1,0 +1,3 @@
+resources:
+  - stateful-set.yaml
+  - service-account.yaml
