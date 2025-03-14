@@ -11,13 +11,13 @@ namespace: scoreserver
 images:
   - name: backend
     newName: ghcr.io/ictsc/ictsc-regalia/backend
-    newTag: sha-db58a52
+    newTag: sha-30bd548
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
-    newTag: sha-db58a52
+    newTag: sha-30bd548
   - name: batch
     newName: ghcr.io/ictsc/ictsc-regalia/batch
-    newTag: sha-db58a52
+    newTag: sha-30bd548
   - name: discord-admin-bot
     newName: ghcr.io/ictsc/ictsc-discord-bot
     newTag: sha-d9e14d2
