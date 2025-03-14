@@ -6,6 +6,7 @@ resources:
   - middleware.yaml
   - maintenance
   - secret-manager-role.yaml
+  - sstate-monitor-sa.yaml
 
 labels:
   - includeSelectors: true
