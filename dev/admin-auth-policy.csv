@@ -1,4 +1,7 @@
+p, role:deploy-viewer, deployments, list
+
 g, ictsc:ictsc2024, role:admin
 g, ictsc:Admin, role:admin
 g, system:serviceaccount:scoreserver:discord-admin-bot, role:admin
 g, system:serviceaccount:scoreserver:scoreserver-batch, role:admin
+g, system:serviceaccount:scoreserver:sstate-monitor, role:deploy-viewer
