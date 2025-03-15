@@ -6,9 +6,11 @@ spec:
   headers:
     accessControlAllowCredentials: true
     accessControlAllowMethods:
+      - "GET"
+      - "OPTIONS"
       - "POST"
     accessControlAllowHeaders:
-      - "Authorization"
+      - "*"
     accessControlAllowOriginList:
       - "*"
     accessControlMaxAge: 100
