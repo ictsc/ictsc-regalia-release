@@ -12,6 +12,6 @@ spec:
     accessControlAllowHeaders:
       - "*"
     accessControlAllowOriginList:
-      - "*"
+      - "localhost:3000"
     accessControlMaxAge: 100
     addVaryHeader: true
