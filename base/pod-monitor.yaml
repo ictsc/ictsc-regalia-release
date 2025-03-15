@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: scoreserver-backend
+  labels:
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/name: scoreserver-backend
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-backend
+  podMetricsEndpoints:
+    - path: /metrics
+      portNumber: 9090
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: scoreserver-batch
+  labels:
+    app.kubernetes.io/name: scoreserver-batch
+    app.kubernetes.io/component: batch
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-batch
+  podMetricsEndpoints:
+    - path: /metrics
+      portNumber: 9090

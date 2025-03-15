@@ -15,6 +15,26 @@ spec:
       labels:
         app.kubernetes.io/name: scoreserver-backend
     spec:
+      initContainers:
+        - name: otelcol
+          image: otel/opentelemetry-collector:0.121.0
+          restartPolicy: Always
+          args:
+            - --config=/etc/otel-col-config.yaml
+          volumeMounts:
+            - name: otel-col-config
+              mountPath: /etc/otel-col-config.yaml
+              subPath: otel-col-config.yaml
+          ports:
+            - containerPort: 9090
+              name: metrics
+          resources:
+            requests:
+              memory: 8Mi
+              cpu: 5m
+            limits:
+              memory: 32Mi
+              cpu: 20m
       containers:
         - name: scoreserver
           image: backend
@@ -60,7 +80,7 @@ spec:
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: grpc
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://otel-col-opentelemetry-collector.otel-col.svc.cluster.local:4317
+              value: http://localhost:4317
           ports:
             - containerPort: 8080
               name: contestant
@@ -85,3 +105,6 @@ spec:
         - name: config
           configMap:
             name: backend-config
+        - name: otel-col-config
+          configMap:
+            name: otel-col-config
