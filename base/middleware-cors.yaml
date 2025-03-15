@@ -11,6 +11,6 @@ spec:
       - "POST"
     accessControlAllowHeaders:
       - "*"
-    accessControlAllowOrigin: "*"
+    accessControlAllowOriginList: "*"
     accessControlMaxAge: 100
     addVaryHeader: true
