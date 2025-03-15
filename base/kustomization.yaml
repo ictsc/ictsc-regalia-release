@@ -4,6 +4,7 @@ resources:
   - deploy-frontend.yaml
   - deploy-oauth2-proxy.yaml
   - pod-monitor.yaml
+  - middleware-cors.yaml
   - middleware.yaml
   - maintenance
   - secret-manager-role.yaml
