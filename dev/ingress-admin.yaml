@@ -23,7 +23,6 @@ spec:
           namespace: traefik
         - name: scoreserver-admin-forward-auth
         - name: scoreserver-strip-api-prefix
-        - name: cors-headers
       services:
         - name: scoreserver-backend
           port: admin
