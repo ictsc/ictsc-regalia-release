@@ -4,7 +4,12 @@ metadata:
   name: cors-headers
 spec:
   headers:
-    customResponseHeaders:
-      Access-Control-Allow-Origin: "*"
-      Access-Control-Allow-Headers: "Authorization"
-      Access-Control-Allow-Methods: "POST"
+    accessControlAllowCredentials: true
+    accessControlAllowMethods:
+      - "POST"
+    accessControlAllowHeaders:
+      - "Authorization"
+    accessControlAllowOriginList:
+      - "*"
+    accessControlMaxAge: 100
+    addVaryHeader: true
