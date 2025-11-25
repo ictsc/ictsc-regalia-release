@@ -49,8 +49,9 @@ replacements:
           name: scoreserver-admin
         fieldPaths:
           - spec.oidc.clientID
-      - select:
-          kind: ConfigMap
-          labelSelector: app.kubernetes.io/name=scoreserver-backend-config
-        fieldPaths:
-          - data.admin-auth-config\.yaml.issuers.[issuer=https://dex.ictsc.net].client_id
+      #TODO: kustomize 5.8+
+      # - select:
+      #     kind: ConfigMap
+      #     labelSelector: app.kubernetes.io/name=scoreserver-backend-config
+      #   fieldPaths:
+      #     - data.admin-auth-config\.yaml.issuers.[issuer=https://dex.ictsc.net].client_id

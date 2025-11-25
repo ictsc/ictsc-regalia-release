@@ -8,4 +8,4 @@ configMapGenerator:
         app.kubernetes.io/name: scoreserver-backend-config
     files:
       - admin-auth-policy.csv
-      - admin-auth-config.yaml
+      # - admin-auth-config.yaml

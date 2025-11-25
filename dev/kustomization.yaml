@@ -7,6 +7,12 @@ resources:
 components:
   - ../components
 
+configMapGenerator:
+  - name: scoreserver-backend-config
+    behavior: merge
+    files:
+      - admin-auth-config.yaml
+
 images:
   - name: backend
     newName: ghcr.io/ictsc/ictsc-regalia/backend
