@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scoreserver-migrate
+  labels:
+    app.kubernetes.io/name: scoreserver-migrate
+    app.kubernetes.io/component: migrate
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scoreserver-migrate
+        app.kubernetes.io/component: migrate
+    spec:
+      serviceAccountName: scoreserver
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: toolbox:TO_BE_REPLACED
+          imagePullPolicy: IfNotPresent
+          command:
+            - ./scripts/migrate
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app
+                  key: host
+            - name: PGDATABASE
+              value: ictscore
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app
+                  key: password
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL

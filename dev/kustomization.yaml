@@ -1,43 +1,25 @@
+namespace: scoreserver
+
 resources:
   - ../base
-  # - ../base/discord-admin-bot
-  - ../base/batch
-  - ingress-contestant.yaml
-  - ingress-admin.yaml
-  # - ./maintenance
+  - params.yaml
 
-namespace: scoreserver
+components:
+  - ../components
 
 images:
   - name: backend
     newName: ghcr.io/ictsc/ictsc-regalia/backend
-    newTag: sha-1aacfb5
+    newTag: sha-a352bc3
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
-    newTag: sha-1aacfb5
+    newTag: sha-a352bc3
   - name: batch
     newName: ghcr.io/ictsc/ictsc-regalia/batch
-    newTag: sha-1aacfb5
+    newTag: sha-a352bc3
+  - name: toolbox
+    newName: ghcr.io/ictsc/ictsc-regalia/toolbox
+    newTag: sha-a352bc3
   - name: discord-admin-bot
     newName: ghcr.io/ictsc/ictsc-discord-bot
     newTag: sha-d9e14d2
-  - name: quay.io/oauth2-proxy/oauth2-proxy
-    newTag: v7.8.1
-
-configMapGenerator:
-  - name: backend-env
-    literals:
-      - contestant-base-url=https://contest-dev.ictsc.net/api
-  - name: backend-config
-    files:
-      - admin-auth-policy.csv
-      - admin-auth-config.yaml
-  - name: oauth2-proxy-env
-    literals:
-      - client-id=dex-scoreserver-client
-      - oidc-issuer-url=https://dex.drove-dev.ictsc.net
-      - redirect-url=https://contest-admin-dev.ictsc.net/oauth2/callback
-  - name: discord-admin-bot-env
-    literals:
-      - discord-application-id=1346701532137001000
-      - discord-guild-id=1342108928804126755

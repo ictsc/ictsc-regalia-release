@@ -1,0 +1,145 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: scoreserver-contestant
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: web
+      namespace: gateway
+  hostnames: []
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-backend
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: scoreserver-frontend
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: scoreserver-contestant-internal
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: web
+      namespace: gateway
+  hostnames:
+    - contest.$k8s-domain.ictsc.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-backend
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: scoreserver-frontend
+          port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: scoreserver-admin
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: web
+      namespace: gateway
+  hostnames:
+    - admin.contest.$k8s-domain.ictsc.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-backend
+          port: 8081
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: scoreserver-frontend
+          port: 8081
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: scoreserver-admin-api
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: web
+      namespace: gateway
+  hostnames:
+    - api.admin.contest.$k8s-domain.ictsc.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: scoreserver-backend
+          port: 8081
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: scoreserver-admin
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: scoreserver-admin
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: scoreserver-contestant-internal
+  oidc:
+    provider:
+      issuer: https://dex.ictsc.net
+    clientID: $admin-client-id
+    clientSecret:
+      name: scoreserver-admin-oauth-client
+    scopes:
+      - openid
+      - profile
+      - groups
+      - offline_access
+    cookieConfig:
+      sameSite: Lax
+    logoutPath: /logout
+    forwardAccessToken: true
