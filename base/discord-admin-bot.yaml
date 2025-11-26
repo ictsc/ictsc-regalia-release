@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: discord-admin-bot
+  labels:
+    app.kubernetes.io/name: discord-admin-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: discord-admin-bot
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: discord-admin-bot
+    spec:
+      serviceAccountName: discord-admin-bot
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: bot
+          image: discord-admin-bot
+          env:
+            - name: STAFF_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-discord-bot
+                  key: staff-password
+            - name: DISCORD_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-discord-bot
+                  key: bot-token
+            - name: DISCORD_APPLICATION_ID
+              value: $discord-app-id
+            - name: DISCORD_GUILD_ID
+              value: $discord-guild-id
+            - name: ADMIN_APIBASE
+              value: http://scoreserver-backend:8081/
+            - name: ADMIN_TOKEN_FILE
+              value: /run/secrets/ictscore/token
+            - name: RUST_BACKTRACE
+              value: full
+          volumeMounts:
+            - mountPath: /run/secrets/ictscore
+              name: ictscore-secrets
+              readOnly: true
+            - mountPath: /etc/bot
+              name: runtime-config
+            - mountPath: /run/secrets/discord-bot
+              name: discord-bot-secrets
+              readOnly: true
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 500m
+            requests:
+              memory: 16Mi
+              cpu: 10m
+      volumes:
+        - name: ictscore-secrets
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: contest.ictsc.net
+                  expirationSeconds: 604800
+                  path: token
+        - name: runtime-config
+          emptyDir: {}
+        - name: discord-bot-secrets
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: scoreserver-discord-bot

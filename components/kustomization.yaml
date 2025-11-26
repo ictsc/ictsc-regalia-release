@@ -55,3 +55,23 @@ replacements:
       #     labelSelector: app.kubernetes.io/name=scoreserver-backend-config
       #   fieldPaths:
       #     - data.admin-auth-config\.yaml.issuers.[issuer=https://dex.ictsc.net].client_id
+  - source:
+      kind: ConfigMap
+      name: params
+      fieldPath: data.discord-app-id
+    targets:
+      - select:
+          kind: StatefulSet
+          name: discord-admin-bot
+        fieldPaths:
+          - spec.template.spec.containers.[name=bot].env.[name=DISCORD_APPLICATION_ID].value
+  - source:
+      kind: ConfigMap
+      name: params
+      fieldPath: data.discord-guild-id
+    targets:
+      - select:
+          kind: StatefulSet
+          name: discord-admin-bot
+        fieldPaths:
+          - spec.template.spec.containers.[name=bot].env.[name=DISCORD_GUILD_ID].value

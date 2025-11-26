@@ -3,6 +3,8 @@ resources:
   - migrate.yaml
   - frontend.yaml
   - backend
+  - batch
+  - discord-admin-bot.yaml
   - httproute.yaml
   # - maintenance
 
