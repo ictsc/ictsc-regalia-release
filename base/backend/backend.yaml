@@ -127,8 +127,6 @@ spec:
               protocol: TCP
             - port: admin
               protocol: TCP
-          rules:
-            http: [{}]
 ---
 apiVersion: v1
 kind: Service
