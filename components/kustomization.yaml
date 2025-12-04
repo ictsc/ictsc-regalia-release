@@ -31,14 +31,6 @@ replacements:
           index: 3
         fieldPaths:
           - spec.hostnames.0
-      - select:
-          kind: Deployment
-          name: scoreserver-backend
-        options:
-          delimiter: "."
-          index: 1
-        fieldPaths:
-          - spec.template.spec.containers.[name=scoreserver].env.[name=CONTESTANT_BASE_URL].value
   - source:
       kind: ConfigMap
       name: params
