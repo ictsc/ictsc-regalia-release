@@ -30,32 +30,34 @@ spec:
           args:
             - --api-url=http://scoreserver-backend:8081
             - --api-token-file=/run/ictstore-secrets/token
-            # - --sstate-ca-file=/var/run/secrets/batch/sstate-ca.crt
           env:
-            # - name: SSTATE_URL
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: sstate-secrets
-            #       key: url 
-            # - name: SSTATE_USER
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: sstate-secrets
-            #       key: user
-            # - name: SSTATE_PASSWORD
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: sstate-secrets
-            #       key: password
+            - name: SSTATE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-sstate-credentials
+                  key: url
+            - name: SSTATE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-sstate-credentials
+                  key: user
+            - name: SSTATE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: scoreserver-sstate-credentials
+                  key: password
             - name: OTEL_METRIC_EXPORT_INTERVAL
               value: "15000"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
               value: grpc
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://localhost:4317
+              value: http://otlp.telemetry:4317
           volumeMounts:
             - mountPath: /run/ictstore-secrets
               name: ictscore-secrets
+              readOnly: true
+            - mountPath: /run/sstate-credentials
+              name: sstate-credentials
               readOnly: true
           resources:
             limits:
@@ -73,3 +75,9 @@ spec:
               - serviceAccountToken:
                   audience: contest.ictsc.net
                   path: token
+        - name: sstate-credentials
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: scoreserver-sstate-credentials
