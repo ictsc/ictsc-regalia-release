@@ -3,3 +3,6 @@ issuers:
     client_id: ouc5cxrxxwt536q2rdlafnabt
     username_key: name
     group_keys: [groups]
+  - issuer: https://kubernetes.default.svc
+    username_key: sub
+    group_keys: [groups]
