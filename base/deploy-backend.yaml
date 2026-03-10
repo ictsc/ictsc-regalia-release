@@ -40,15 +40,11 @@ spec:
           image: backend
           args:
             - --contestant.http-addr=0.0.0.0:8080
+            - --contestant.route-prefix=/api
             - --admin.http-addr=0.0.0.0:8081
             - --admin.auth-config-file=/etc/scoreserver/admin-auth-config.yaml
             - --admin.auth-policy-file=/etc/scoreserver/admin-auth-policy.csv
           env:
-            - name: CONTESTANT_BASE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-env
-                  key: contestant-base-url
             - name: PGHOST
               value: ictsc-cluster
             - name: PGDATABASE
