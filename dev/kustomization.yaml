@@ -16,16 +16,16 @@ configMapGenerator:
 images:
   - name: backend
     newName: ghcr.io/ictsc/ictsc-regalia/backend
-    newTag: sha-d7bc676
+    newTag: sha-66a34bf
   - name: frontend
     newName: ghcr.io/ictsc/ictsc-regalia/frontend
-    newTag: sha-d7bc676
+    newTag: sha-66a34bf
   - name: batch
     newName: ghcr.io/ictsc/ictsc-regalia/batch
-    newTag: sha-d7bc676
+    newTag: sha-66a34bf
   - name: toolbox
     newName: ghcr.io/ictsc/ictsc-regalia/toolbox
-    newTag: sha-d7bc676
+    newTag: sha-66a34bf
   - name: discord-admin-bot
     newName: ghcr.io/ictsc/ictsc-discord-bot
     newTag: sha-d9e14d2
