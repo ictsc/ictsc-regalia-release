@@ -1,6 +1,0 @@
-p, role:deploy-viewer, deployments, list
-
-g, ictsc:ictsc2025, role:admin
-g, system:serviceaccount:scoreserver:scoreserver-admin, role:admin
-g, system:serviceaccount:scoreserver:discord-admin-bot, role:admin
-g, system:serviceaccount:scoreserver:scoreserver-batch, role:admin

@@ -1,21 +1,15 @@
 resources:
-  - service.yaml
-  - deploy-backend.yaml
-  - deploy-frontend.yaml
-  - deploy-oauth2-proxy.yaml
-  - pod-monitor.yaml
-  - middleware-cors.yaml
-  - middleware.yaml
-  - maintenance
-  - secret-manager-role.yaml
-  - sstate-monitor-sa.yaml
+  - database.yaml
+  - migrate.yaml
+  - frontend.yaml
+  - backend
+  - batch.yaml
+  # - discord-admin-bot.yaml
+  - httproute.yaml
+  # - maintenance
 
 labels:
   - includeSelectors: true
+    includeTemplates: true
     pairs:
       app.kubernetes.io/part-of: scoreserver
-
-configMapGenerator:
-  - name: otel-col-config
-    files:
-      - otel-col-config.yaml

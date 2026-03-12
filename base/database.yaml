@@ -1,0 +1,9 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: scoreserver-db
+spec:
+  name: ictscore
+  cluster:
+    name: postgres
+  owner: app

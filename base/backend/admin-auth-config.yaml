@@ -1,6 +1,6 @@
 issuers:
   - issuer: https://dex.ictsc.net
-    client_id: ouc5cxrxxwt536q2rdlafnabt
+    client_id: $admin-client-id
     username_key: name
     group_keys: [groups]
   - issuer: https://kubernetes.default.svc

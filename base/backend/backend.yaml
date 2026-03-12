@@ -1,0 +1,149 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scoreserver-backend
+  labels:
+    app.kubernetes.io/name: scoreserver-backend
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-backend
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scoreserver-backend
+        app.kubernetes.io/component: backend
+    spec:
+      serviceAccountName: scoreserver
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault 
+      containers:
+        - name: scoreserver
+          image: backend
+          args:
+            - --contestant.http-addr=0.0.0.0:8080
+            - --contestant.route-prefix=/api
+            - --admin.http-addr=0.0.0.0:8081
+            - --admin.auth-config-file=/etc/ictscore/admin-auth-config.yaml
+            - --admin.auth-policy-file=/etc/ictscore/admin-auth-policy.csv
+          env:
+            - name: PGHOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app
+                  key: host
+            - name: PGDATABASE
+              value: ictscore
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app
+                  key: password
+            - name: REDIS_URL
+              value: redis://valkey-proxy:6379/0
+            - name: DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: discord-oauth-client
+                  key: client-id
+            - name: DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: discord-oauth-client
+                  key: client-secret
+            - name: OTEL_METRIC_EXPORT_INTERVAL
+              value: "15000"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otlp.telemetry:4317
+          ports:
+            - containerPort: 8080
+              name: contestant
+            - containerPort: 8081
+              name: admin
+          volumeMounts:
+            - mountPath: /etc/ictscore
+              name: config
+              readOnly: true
+            - mountPath: /run/secrets/discord-oauth-client
+              name: discord-oauth-client
+              readOnly: true
+          livenessProbe:
+            initialDelaySeconds: 10
+            grpc:
+              port: 8081
+          resources:
+            requests:
+              memory: 16Mi
+              cpu: 10m
+            limits:
+              memory: 128Mi
+              cpu: "1"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: config
+          configMap:
+            name: scoreserver-backend-config
+        - name: discord-oauth-client
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: discord-oauth-client
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: scoreserver-backend
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: scoreserver-backend
+      app.kubernetes.io/component: backend
+  ingress:
+    - fromEntities: [cluster]
+      toPorts:
+        - ports:
+            - port: contestant
+              protocol: TCP
+            - port: admin
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scoreserver-backend
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: scoreserver-backend
+    app.kubernetes.io/component: backend
+  ports:
+    - name: contestant
+      port: 8080
+      targetPort: contestant
+      protocol: TCP
+      appProtocol: kubernetes.io/h2c
+    - name: admin
+      port: 8081
+      targetPort: admin
+      protocol: TCP
+      appProtocol: kubernetes.io/h2c

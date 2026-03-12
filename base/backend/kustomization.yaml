@@ -1,0 +1,11 @@
+resources:
+  - backend.yaml
+
+configMapGenerator:
+  - name: scoreserver-backend-config
+    options:
+      labels:
+        app.kubernetes.io/name: scoreserver-backend-config
+    files:
+      - admin-auth-policy.csv
+      # - admin-auth-config.yaml

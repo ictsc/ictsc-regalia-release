@@ -1,0 +1,69 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+replacements:
+  - source:
+      kind: ConfigMap
+      name: params
+      fieldPath: data.k8s-domain
+    targets:
+      - select:
+          kind: HTTPRoute
+          name: scoreserver-contestant-internal
+        options:
+          delimiter: "."
+          index: 1
+        fieldPaths:
+          - spec.hostnames.0
+      - select:
+          kind: HTTPRoute
+          name: scoreserver-admin
+        options:
+          delimiter: "."
+          index: 2
+        fieldPaths:
+          - spec.hostnames.0
+      - select:
+          kind: HTTPRoute
+          name: scoreserver-admin-api
+        options:
+          delimiter: "."
+          index: 3
+        fieldPaths:
+          - spec.hostnames.0
+  - source:
+      kind: ConfigMap
+      name: params
+      fieldPath: data.admin-client-id
+    targets:
+      - select:
+          kind: SecurityPolicy
+          name: scoreserver-admin
+        fieldPaths:
+          - spec.oidc.clientID
+      #TODO: kustomize 5.8+
+      # - select:
+      #     kind: ConfigMap
+      #     labelSelector: app.kubernetes.io/name=scoreserver-backend-config
+      #   fieldPaths:
+      #     - data.admin-auth-config\.yaml.issuers.[issuer=https://dex.ictsc.net].client_id
+  - source:
+      kind: ConfigMap
+      name: params
+      fieldPath: data.discord-app-id
+    targets:
+      - select:
+          kind: StatefulSet
+          name: discord-admin-bot
+        fieldPaths:
+          - spec.template.spec.containers.[name=bot].env.[name=DISCORD_APPLICATION_ID].value
+  - source:
+      kind: ConfigMap
+      name: params
+      fieldPath: data.discord-guild-id
+    targets:
+      - select:
+          kind: StatefulSet
+          name: discord-admin-bot
+        fieldPaths:
+          - spec.template.spec.containers.[name=bot].env.[name=DISCORD_GUILD_ID].value
