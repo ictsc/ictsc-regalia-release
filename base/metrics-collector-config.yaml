@@ -32,6 +32,7 @@ receivers:
           SELECT
             teams.code AS "team.code",
             teams.name AS "team.name",
+            teams.organization AS "team.organization",
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
@@ -50,6 +51,7 @@ receivers:
             attribute_columns:
               - team.code
               - team.name
+              - team.organization
               - problem.code
               - problem.title
               - problem.category
@@ -60,6 +62,7 @@ receivers:
           SELECT
             teams.code AS "team.code",
             teams.name AS "team.name",
+            teams.organization AS "team.organization",
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
@@ -76,6 +79,7 @@ receivers:
             attribute_columns:
               - team.code
               - team.name
+              - team.organization
               - problem.code
               - problem.title
               - problem.category
@@ -103,6 +107,7 @@ receivers:
           SELECT
             teams.code AS "team.code",
             teams.name AS "team.name",
+            teams.organization AS "team.organization",
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
@@ -119,6 +124,7 @@ receivers:
             attribute_columns:
               - team.code
               - team.name
+              - team.organization
               - problem.code
               - problem.title
               - problem.category
@@ -128,6 +134,7 @@ receivers:
           SELECT
             teams.code AS "team.code",
             teams.name AS "team.name",
+            teams.organization AS "team.organization",
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
@@ -146,6 +153,7 @@ receivers:
             attribute_columns:
               - team.code
               - team.name
+              - team.organization
               - problem.code
               - problem.title
               - problem.category
@@ -155,6 +163,7 @@ receivers:
           SELECT
             teams.code AS "team.code",
             teams.name AS "team.name",
+            teams.organization AS "team.organization",
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
@@ -173,6 +182,7 @@ receivers:
             attribute_columns:
               - team.code
               - team.name
+              - team.organization
               - problem.code
               - problem.title
               - problem.category
