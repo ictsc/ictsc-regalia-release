@@ -1,0 +1,12 @@
+resources:
+  - ./source.yaml
+  - ./cache.yaml
+
+configMapGenerator:
+  - name: scoreserver-image-source-configs
+    files:
+      - known_hosts=deploy-known-hosts
+      - nginx.conf=source-nginx.conf
+  - name: scoreserver-image-cache-configs
+    files:
+      - nginx.conf=cache-nginx.conf
