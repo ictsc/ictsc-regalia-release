@@ -30,17 +30,12 @@ spec:
           args:
             - --api-url=http://scoreserver-backend:8081
             - --api-token-file=/run/ictstore-secrets/token
+            - --sstate-ca-file=/run/sstate-ca/ca.crt
           env:
             - name: SSTATE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: scoreserver-sstate-credentials
-                  key: url
+              value: https://sstate.ictsc.net
             - name: SSTATE_USER
-              valueFrom:
-                secretKeyRef:
-                  name: scoreserver-sstate-credentials
-                  key: user
+              value: ictsc
             - name: SSTATE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -58,6 +53,9 @@ spec:
               readOnly: true
             - mountPath: /run/sstate-credentials
               name: sstate-credentials
+              readOnly: true
+            - mountPath: /run/sstate-ca
+              name: sstate-ca
               readOnly: true
           resources:
             limits:
@@ -81,3 +79,6 @@ spec:
             readOnly: true
             volumeAttributes:
               secretProviderClass: scoreserver-sstate-credentials
+        - name: sstate-ca
+          configMap:
+            name: scoreserver-sstate-ca

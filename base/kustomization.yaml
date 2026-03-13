@@ -8,6 +8,11 @@ resources:
   - httproute.yaml
   # - maintenance
 
+configMapGenerator:
+  - name: scoreserver-sstate-ca
+    files:
+      - ca.crt=sstate-ca.crt
+
 labels:
   - includeSelectors: true
     includeTemplates: true
