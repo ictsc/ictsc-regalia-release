@@ -1,0 +1,194 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+
+receivers:
+  sqlquery:
+    driver: postgres
+    datasource: host=${env:PGHOST} port=5432 dbname=${env:PGDATABASE} user=${env:PGUSER} password=${env:PGPASSWORD} sslmode=disable
+    collection_interval: 60s
+    queries:
+      - sql: |
+          SELECT
+            teams.code AS "team.code",
+            teams.name AS "team.name",
+            teams.organization AS "team.organization",
+            count(team_members.user_id) AS count
+          FROM team_members
+          RIGHT JOIN teams ON team_members.team_id = teams.id
+          GROUP BY teams.id
+        metrics:
+          - metric_name: scoreserver.team.member_count
+            description: Count of members in the team.
+            unit: "{member}"
+            value_column: count
+            attribute_columns:
+              - team.code
+              - team.name
+              - team.organization
+            data_type: gauge
+            value_type: int
+      - sql: |
+          SELECT
+            teams.code AS "team.code",
+            teams.name AS "team.name",
+            problems.code AS "problem.code",
+            problems.title AS "problem.title",
+            problems.category AS "problem.category",
+            scores.total_score AS score
+          FROM problem_scores
+          INNER JOIN teams ON problem_scores.team_id = teams.id
+          INNER JOIN problems ON problem_scores.problem_id = problems.id
+          INNER JOIN scores ON problem_scores.marking_result_id = scores.marking_result_id
+          WHERE problem_scores.visibility = 'PRIVATE'
+        metrics:
+          - metric_name: scoreserver.total_score
+            description: Latest score by team and problem.
+            unit: "{score}"
+            value_column: score
+            attribute_columns:
+              - team.code
+              - team.name
+              - problem.code
+              - problem.title
+              - problem.category
+            data_type: gauge
+            value_type: int
+      - sql: |
+          SELECT
+            teams.code AS "team.code",
+            teams.name AS "team.name",
+            problems.code AS "problem.code",
+            problems.title AS "problem.title",
+            problems.category AS "problem.category",
+            COUNT(answers.id) AS submissions
+          FROM answers
+          INNER JOIN teams ON answers.team_id = teams.id
+          INNER JOIN problems ON answers.problem_id = problems.id
+          GROUP BY teams.id, problems.id
+        metrics:
+          - metric_name: scoreserver.submission_count
+            description: Submission count by team and problem.
+            unit: "{submission}"
+            value_column: submissions
+            attribute_columns:
+              - team.code
+              - team.name
+              - problem.code
+              - problem.title
+              - problem.category
+            data_type: gauge
+            value_type: int
+      - sql: |
+          SELECT
+            problems.code AS "problem.code",
+            problems.title AS "problem.title",
+            problems.category AS "problem.category",
+            problems.max_score AS max_score
+          FROM problems
+        metrics:
+          - metric_name: scoreserver.problem.max_score
+            description: Maximum score for the problem.
+            unit: "{score}"
+            value_column: max_score
+            attribute_columns:
+              - problem.code
+              - problem.title
+              - problem.category
+            data_type: gauge
+            value_type: int
+      - sql: |
+          SELECT
+            teams.code AS "team.code",
+            teams.name AS "team.name",
+            problems.code AS "problem.code",
+            problems.title AS "problem.title",
+            problems.category AS "problem.category",
+            COUNT(1) AS redeployment_count
+          FROM redeployment_requests
+          INNER JOIN teams ON redeployment_requests.team_id = teams.id
+          INNER JOIN problems ON redeployment_requests.problem_id = problems.id
+          GROUP BY teams.id, problems.id
+        metrics:
+          - metric_name: scoreserver.redeployment_request_count
+            description: Redeployment request count by team and problem.
+            unit: "{request}"
+            value_column: redeployment_count
+            attribute_columns:
+              - team.code
+              - team.name
+              - problem.code
+              - problem.title
+              - problem.category
+            data_type: gauge
+            value_type: int
+      - sql: |
+          SELECT
+            teams.code AS "team.code",
+            teams.name AS "team.name",
+            problems.code AS "problem.code",
+            problems.title AS "problem.title",
+            problems.category AS "problem.category",
+            EXTRACT(EPOCH FROM MAX(NOW() - LOWER(answers.created_at_range))) AS waiting_duration_seconds
+          FROM answers
+          LEFT JOIN marking_results ON answers.id = marking_results.answer_id
+          INNER JOIN teams ON answers.team_id = teams.id
+          INNER JOIN problems ON answers.problem_id = problems.id
+          WHERE marking_results.id IS NULL
+          GROUP BY teams.id, problems.id
+        metrics:
+          - metric_name: scoreserver.unmarked_wait_duration
+            description: Longest waiting time for marking submissions by team and problem.
+            unit: s
+            value_column: waiting_duration_seconds
+            attribute_columns:
+              - team.code
+              - team.name
+              - problem.code
+              - problem.title
+              - problem.category
+            data_type: gauge
+            value_type: double
+      - sql: |
+          SELECT
+            teams.code AS "team.code",
+            teams.name AS "team.name",
+            problems.code AS "problem.code",
+            problems.title AS "problem.title",
+            problems.category AS "problem.category",
+            COUNT(answers.id) AS count
+          FROM answers
+          LEFT JOIN marking_results ON answers.id = marking_results.answer_id
+          INNER JOIN teams ON answers.team_id = teams.id
+          INNER JOIN problems ON answers.problem_id = problems.id
+          WHERE marking_results.id IS NULL
+          GROUP BY teams.id, problems.id
+        metrics:
+          - metric_name: scoreserver.unmarked_submission_count
+            description: Unmarked submission count by team and problem.
+            unit: "{submission}"
+            value_column: count
+            attribute_columns:
+              - team.code
+              - team.name
+              - problem.code
+              - problem.title
+              - problem.category
+            data_type: gauge
+            value_type: int
+
+exporters:
+  otlp:
+    endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT}
+    tls:
+      insecure: true
+
+service:
+  extensions:
+    - health_check
+  pipelines:
+    metrics:
+      receivers:
+        - sqlquery
+      exporters:
+        - otlp

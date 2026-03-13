@@ -4,6 +4,7 @@ resources:
   - frontend.yaml
   - backend
   - batch.yaml
+  - metrics-collector.yaml
   # - discord-admin-bot.yaml
   - httproute.yaml
   # - maintenance
@@ -12,6 +13,13 @@ configMapGenerator:
   - name: scoreserver-sstate-ca
     files:
       - ca.crt=sstate-ca.crt
+  - name: scoreserver-metrics-collector-config
+    files:
+      - collector.yaml=metrics-collector-config.yaml
+    options:
+      labels:
+        app.kubernetes.io/name: scoreserver-metrics-collector
+        app.kubernetes.io/component: metrics-collector
 
 labels:
   - includeSelectors: true
