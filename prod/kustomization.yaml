@@ -7,6 +7,9 @@ resources:
 components:
   - ../components
 
+patches:
+  - path: contestant-httproute-patch.yaml
+
 configMapGenerator:
   - name: scoreserver-backend-config
     behavior: merge
