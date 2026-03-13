@@ -7,8 +7,22 @@ spec:
     - kind: Gateway
       name: web
       namespace: gateway
-  hostnames: []
+  hostnames:
+    - contest-placeholder.invalid
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /images
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-image-cache
+          port: 8080
     - matches:
         - path:
             type: PathPrefix
@@ -45,6 +59,19 @@ spec:
     - matches:
         - path:
             type: PathPrefix
+            value: /images
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-image-cache
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
             value: /api
       filters:
         - type: URLRewrite
@@ -75,6 +102,19 @@ spec:
   hostnames:
     - admin.contest.$k8s-domain.ictsc.net
   rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /images
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: scoreserver-image-cache
+          port: 8080
     - matches:
         - path:
             type: PathPrefix

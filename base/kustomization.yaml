@@ -3,6 +3,7 @@ resources:
   - migrate.yaml
   - frontend.yaml
   - backend
+  - images
   - batch.yaml
   - metrics-collector.yaml
   # - discord-admin-bot.yaml
