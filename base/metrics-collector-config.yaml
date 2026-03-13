@@ -10,7 +10,7 @@ receivers:
     queries:
       - sql: |
           SELECT
-            teams.code AS "team.code",
+            LPAD(teams.code::TEXT, 2, '0') AS "team.code",
             teams.name AS "team.name",
             teams.organization AS "team.organization",
             count(team_members.user_id) AS count
@@ -30,7 +30,7 @@ receivers:
             value_type: int
       - sql: |
           SELECT
-            teams.code AS "team.code",
+            LPAD(teams.code::TEXT, 2, '0') AS "team.code",
             teams.name AS "team.name",
             teams.organization AS "team.organization",
             problems.code AS "problem.code",
@@ -60,7 +60,7 @@ receivers:
             value_type: int
       - sql: |
           SELECT
-            teams.code AS "team.code",
+            LPAD(teams.code::TEXT, 2, '0') AS "team.code",
             teams.name AS "team.name",
             teams.organization AS "team.organization",
             problems.code AS "problem.code",
@@ -105,7 +105,7 @@ receivers:
             value_type: int
       - sql: |
           SELECT
-            teams.code AS "team.code",
+            LPAD(teams.code::TEXT, 2, '0') AS "team.code",
             teams.name AS "team.name",
             teams.organization AS "team.organization",
             problems.code AS "problem.code",
@@ -132,7 +132,7 @@ receivers:
             value_type: int
       - sql: |
           SELECT
-            teams.code AS "team.code",
+            LPAD(teams.code::TEXT, 2, '0') AS "team.code",
             teams.name AS "team.name",
             teams.organization AS "team.organization",
             problems.code AS "problem.code",
@@ -161,7 +161,7 @@ receivers:
             value_type: double
       - sql: |
           SELECT
-            teams.code AS "team.code",
+            LPAD(teams.code::TEXT, 2, '0') AS "team.code",
             teams.name AS "team.name",
             teams.organization AS "team.organization",
             problems.code AS "problem.code",
