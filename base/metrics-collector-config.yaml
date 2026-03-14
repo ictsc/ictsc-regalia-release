@@ -36,13 +36,21 @@ receivers:
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
-            LOWER(problem_scores.visibility::TEXT) AS visibility,
-            scores.total_score AS score
-          FROM problem_scores
-          INNER JOIN teams ON problem_scores.team_id = teams.id
-          INNER JOIN problems ON problem_scores.problem_id = problems.id
-          INNER JOIN scores ON problem_scores.marking_result_id = scores.marking_result_id
-          WHERE problem_scores.visibility IN ('PRIVATE', 'PUBLIC')
+            visibilities.visibility,
+            COALESCE(MAX(scores.total_score), 0) AS score
+          FROM teams
+          CROSS JOIN problems
+          CROSS JOIN (
+            SELECT 'private'::TEXT AS visibility
+            UNION ALL
+            SELECT 'public'::TEXT AS visibility
+          ) AS visibilities
+          LEFT JOIN problem_scores
+            ON problem_scores.team_id = teams.id
+           AND problem_scores.problem_id = problems.id
+           AND LOWER(problem_scores.visibility::TEXT) = visibilities.visibility
+          LEFT JOIN scores ON problem_scores.marking_result_id = scores.marking_result_id
+          GROUP BY teams.id, problems.id, visibilities.visibility
         metrics:
           - metric_name: scoreserver.total_score
             description: Latest score by team and problem.
@@ -67,9 +75,11 @@ receivers:
             problems.title AS "problem.title",
             problems.category AS "problem.category",
             COUNT(answers.id) AS submissions
-          FROM answers
-          INNER JOIN teams ON answers.team_id = teams.id
-          INNER JOIN problems ON answers.problem_id = problems.id
+          FROM teams
+          CROSS JOIN problems
+          LEFT JOIN answers
+            ON answers.team_id = teams.id
+           AND answers.problem_id = problems.id
           GROUP BY teams.id, problems.id
         metrics:
           - metric_name: scoreserver.submission_count
@@ -111,10 +121,12 @@ receivers:
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
-            COUNT(1) AS redeployment_count
-          FROM redeployment_requests
-          INNER JOIN teams ON redeployment_requests.team_id = teams.id
-          INNER JOIN problems ON redeployment_requests.problem_id = problems.id
+            COUNT(redeployment_requests.id) AS redeployment_count
+          FROM teams
+          CROSS JOIN problems
+          LEFT JOIN redeployment_requests
+            ON redeployment_requests.team_id = teams.id
+           AND redeployment_requests.problem_id = problems.id
           GROUP BY teams.id, problems.id
         metrics:
           - metric_name: scoreserver.redeployment_request_count
