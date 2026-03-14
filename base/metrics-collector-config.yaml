@@ -138,12 +138,19 @@ receivers:
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
-            EXTRACT(EPOCH FROM MAX(NOW() - LOWER(answers.created_at_range))) AS waiting_duration_seconds
-          FROM answers
+            COALESCE(
+              EXTRACT(
+                EPOCH FROM MAX(NOW() - LOWER(answers.created_at_range))
+                FILTER (WHERE answers.id IS NOT NULL AND marking_results.id IS NULL)
+              ),
+              0
+            ) AS waiting_duration_seconds
+          FROM teams
+          CROSS JOIN problems
+          LEFT JOIN answers
+            ON answers.team_id = teams.id
+           AND answers.problem_id = problems.id
           LEFT JOIN marking_results ON answers.id = marking_results.answer_id
-          INNER JOIN teams ON answers.team_id = teams.id
-          INNER JOIN problems ON answers.problem_id = problems.id
-          WHERE marking_results.id IS NULL
           GROUP BY teams.id, problems.id
         metrics:
           - metric_name: scoreserver.unmarked_wait_duration
@@ -167,12 +174,13 @@ receivers:
             problems.code AS "problem.code",
             problems.title AS "problem.title",
             problems.category AS "problem.category",
-            COUNT(answers.id) AS count
-          FROM answers
+            COUNT(answers.id) FILTER (WHERE marking_results.id IS NULL) AS count
+          FROM teams
+          CROSS JOIN problems
+          LEFT JOIN answers
+            ON answers.team_id = teams.id
+           AND answers.problem_id = problems.id
           LEFT JOIN marking_results ON answers.id = marking_results.answer_id
-          INNER JOIN teams ON answers.team_id = teams.id
-          INNER JOIN problems ON answers.problem_id = problems.id
-          WHERE marking_results.id IS NULL
           GROUP BY teams.id, problems.id
         metrics:
           - metric_name: scoreserver.unmarked_submission_count
