@@ -37,4 +37,4 @@ images:
     newTag: 1.27.4
   - name: git-sync
     newName: registry.k8s.io/git-sync/git-sync
-    newTag: v4.6.0
+    newTag: v4.8.0
