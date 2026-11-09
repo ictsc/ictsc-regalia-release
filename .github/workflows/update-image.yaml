@@ -34,7 +34,7 @@ jobs:
           git push --force origin $(git branch --show-current):update-image-${{ matrix.environment }}
 
       - name: Create or update pull request
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           inputs: ${{ toJSON(inputs) }}
           matrix: ${{ toJSON(matrix) }}
